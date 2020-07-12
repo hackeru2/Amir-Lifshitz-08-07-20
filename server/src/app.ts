@@ -72,7 +72,7 @@ app.post("/api/task/create", (req, res, next) => {
     // }
     var data = {
         content: req.body.name,
-        date: req.body.date,
+        date: new Date().toLocaleString(),//  req.body.date,
         username: req.body.username,
         tel: req.body.tel,
         email: req.body.email,
@@ -109,7 +109,7 @@ app.post("/api/task/create", (req, res, next) => {
 app.put("/api/task/:index/update", (req, res: Response, next) => {
     var data = {
         content: req.body.content,
-        date: req.body.date,
+        date: new Date().toLocaleString(), //req.body.date,
         email: req.body.email,
         tel: req.body.tel,
         username: req.body.username,
@@ -117,8 +117,8 @@ app.put("/api/task/:index/update", (req, res: Response, next) => {
     }
     db.run(
         `UPDATE task set content =  ? , email = ? ,  tel =  ?,  
-        username = ?  WHERE id = ?`,
-        [data.content, data.email, data.tel, data.username, data.index],
+        date = ?  WHERE id = ?`,
+        [data.content, data.email, data.tel, data.date, data.index],
         function (err: any, result: any) {
             if (err) {
                 res.status(400).json({ "error": res.statusMessage })

@@ -10,14 +10,17 @@ import Navbar from "./components/Navbar";
 import Table from "./components/Table";
 import TaskShow from "./components/TaskShow";
 class App extends Component {
-  state = { TaskComponent: false, edit: false, forb: { id: 0 }, delete: false, Forbs: [] }
+  state = { TaskComponent: false, edit: false, forb: { id: 0 }, delete: false, Forbs: [], username: "עמיר", illegalAction: false }
 
+  setIllegalAction = (illegalAction: boolean) => this.setState({ illegalAction })
+  setUser = (username: string) => this.setState({ username, TaskComponent: false, delete: false })
   getAllTasks = async () => {
     this.setState({ delete: false })
-    let { data: Forbs } = await axios.get("http://localhost:5000/all");
+    let { data: Forbs } = await axios.get(`${this.url()}all`);
     this.setState({ Forbs })
     return Forbs;
   }
+  url = () => process.env.NODE_ENV === "development" ? "http://localhost:5000/" : window.location.href
   info = (msg: String) => {
     message.info(msg);
   };
@@ -28,8 +31,10 @@ class App extends Component {
     message.error(msg);
   };
   deleteConfirm = async (id: number) => {
+
+    //http://localhost:5000
     try {
-      let { data: ForbsDelete } = await axios.delete(`http://localhost:5000/${id}/delete`);
+      let { data: ForbsDelete } = await axios.delete(`${this.url()}${id}/delete`);
       this.info('רשימה נמחקה')
       console.log('ForbsDelete', ForbsDelete)
       this.getAllTasks()
@@ -51,8 +56,9 @@ class App extends Component {
     this.setState({ edit: false, delete: i })
     this.setState({ forb: this.state.Forbs[i] })
   }
-  setTask = (i: any) => {
-    this.setState({ TaskComponent: i })
+  setTask = (id: any) => {
+    this.setState({ TaskComponent: id })
+    if (!id) this.setState({ TaskComponent: id, forb: this.state.Forbs[0] })
     this.setState({ edit: false })
     this.setState({ delete: false })
   }
@@ -70,17 +76,22 @@ class App extends Component {
   }
 
   render() {
+
     let deleteConfirmModal = <DeleteConfirm
       deleteConfirm={this.deleteConfirm}
       delete={this.state.delete}
       forb={this.state.forb}
+      url={this.url()}
       setTaskDelete={this.setTaskDelete} />
 
     if (!this.state.delete) deleteConfirmModal = <span></span>;
 
     const mainWindow = this.state.TaskComponent !== false ?
       <TaskShow setTask={this.setTask}
+        Forbs={this.state.Forbs}
+        username={this.state.username}
         error={this.error}
+        url={this.url()}
         success={this.success}
         setForb={this.setForb}
         forb={this.state.forb}
@@ -88,6 +99,9 @@ class App extends Component {
         TaskComponent={this.state.TaskComponent}
         edit={this.state.edit} />
       : <Table
+        setIllegalAction={this.setIllegalAction}
+        url={this.url()}
+        username={this.state.username}
         getAllTasks={this.getAllTasks}
         Forbs={this.state.Forbs}
         setForbs={this.setForbs}
@@ -98,9 +112,11 @@ class App extends Component {
 
 
     return <div>
-      <Navbar />
+      <Navbar username={this.state.username}
+        setUser={this.setUser} />
       <div className="container mt-4">
-        <h1>HI REACT</h1>
+        <h1>Task Assignment Amir Lifshitz</h1>
+        {/* {this.state.illegalAction && !this.state.TaskComponent ? <span>ILLEGAL ACTION</span> : null} */}
         {mainWindow}
         {deleteConfirmModal}
       </div>

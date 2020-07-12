@@ -15,9 +15,9 @@ const DeleteConfirm = props => {
             icon: <ExclamationCircleOutlined />,
             content: 'Some descriptions',
             onOk() {
-                console.log('OK');
-
-                props.deleteConfirm(props.delete)
+                let id = props.delete
+                console.log('OK deleting ' + props.delete);
+                props.deleteConfirm(id)
             },
             onCancel() {
                 console.log('Cancel');

@@ -1,10 +1,10 @@
-import axios from "axios";
 import React, { Component } from 'react';
 import deleteB from "./delete.png";
 import editB from "./edit.png";
 import watchB from "./watch.png";
 class Table extends Component {
 
+    cannotEdit = username => username !== this.props.username && this.props.username !== "מנהל"
     onShow = i => this.props.setTask(i)
     onEdit = i => this.props.setTaskEdit(i)
     onDelete = i => this.props.setTaskDelete(i)
@@ -16,10 +16,10 @@ class Table extends Component {
         // console.log('ForbsFirst', ForbsFirst)
         // let { data: ForbsUpdate } = await axios.put("http://localhost:5000/1/update");
         // console.log('ForbsUpdate', ForbsUpdate)
-        let { data: ForbsDelete } = await axios.delete("http://localhost:5000/1/delete");
-        console.log('ForbsDelete', ForbsDelete)
-        let { data: ForbsCreate } = await axios.post("http://localhost:5000/1/create");
-        console.log('ForbsCreate', ForbsCreate)
+        // let { data: ForbsDelete } = await axios.delete("http://localhost:5000/1/delete");
+        // console.log('ForbsDelete', ForbsDelete)
+        // let { data: ForbsCreate } = await axios.post("http://localhost:5000/1/create");
+        // console.log('ForbsCreate', ForbsCreate)
 
 
     }
@@ -30,6 +30,8 @@ class Table extends Component {
         // console.log('this.state.Forbs', this.state.Forbs)
         const rows =
             this.props.Forbs.map((forb, index) => {
+                forb.class = "center-image"
+                if (this.cannotEdit(forb.username)) forb.class += " c-not-allowed"
                 return (
                     <tr key={forb.id} className="tr-right" >
                         <td><span>{forb.username}</span></td>
@@ -37,17 +39,18 @@ class Table extends Component {
                         <td><span>{forb.date}</span></td>
                         <td><span>{forb.email}</span></td>
                         <td>
+
                             <div className="row" style={{ 'fontSize': '10px' }}  >
                                 <div className="column col-avatar  ">
-                                    <img src={watchB} alt="Snow" onClick={!index ? () => { } : () => this.onShow(forb.id)} className="center-image" />
+                                    <img src={watchB} alt="Snow" onClick={!index ? null : () => this.onShow(forb.id)} className="center-image" />
                                     <p className="text-center">צפייה</p>
                                 </div>
                                 <div className="column col-avatar">
-                                    <img src={editB} alt="עריכה" onClick={!index ? () => { } : () => this.onEdit(forb.id)} className="center-image" />
+                                    <img src={editB} alt="עריכה" onClick={() => !index || this.cannotEdit(forb.username) ? null : this.onEdit(forb.id)} className={forb.class} />
                                     <p className="text-center">עריכה</p>
                                 </div>
-                                <div className="column col-avatar ">
-                                    <img src={deleteB} onClick={!index ? () => { } : () => this.onDelete(forb.id)} className="center-image" alt="Mountains" />
+                                <div className="column col-avatar">
+                                    <img src={deleteB} onClick={() => !index || this.cannotEdit(forb.username) ? null : this.onDelete(forb.id)} className={forb.class} alt="מחיקה" />
                                     <p className="text-center">מחיקה</p>
                                 </div>
                             </div>
